@@ -1,0 +1,47 @@
+# .cirrus.yml
+
+checkout:
+  git:
+    depth: 1
+
+tasks:
+  - name: Install Ubuntu and Android Development Environment
+    command: |
+      # Update the package manager
+      sudo apt-get update
+      
+      # Install necessary packages
+      sudo apt-get install openjdk-8-jdk git-core gnupg flex bison gperf build-essential \
+      zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev \
+      x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc unzip
+      
+      # Install repo
+      curl https://storage.googleapis.com/git-repo-downloads/repo > repo
+      chmod a+x repo
+      sudo mv repo /usr/local/bin/
+      
+      # Create a directory for the Pixel device
+      mkdir pixel
+      cd pixel
+      
+  - name: Clone Treble Build PE Repo
+    command: |
+      # Clone the repo
+      git clone https://github.com/ponces/treble_build_pe -b thirteen
+      
+  - name: Build and Upload to GitHub Releases
+    command: |
+      # Start the build script
+      bash treble_build_pe/build.sh thirteen
+      
+      # Move the built image to the release folder
+      mv out/target/product/pixel/*.img release/
+      
+      # Create a new release
+      git tag -a v1.0.0 -m "Initial release"
+      
+      # Push the tag to GitHub
+      git push origin v1.0.0
+      
+      # Upload the image to the release
+      hub release create -a release/*.img -m "Initial release" v1.0.0
