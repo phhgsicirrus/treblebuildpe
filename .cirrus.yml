@@ -32,7 +32,8 @@ tasks:
   - name: Build and Upload to GitHub Releases
     command: |
       # Start the build script
-      bash treble_build_pe/build.sh thirteen
+      bash treble_build_pe/build.sh thirteen 
+     
       
       # Move the built image to the release folder
       mv out/target/product/pixel/*.img release/
@@ -44,4 +45,4 @@ tasks:
       git push origin v1.0.0
       
       # Upload the image to the release
-      hub release create -a release/*.img -m "Initial release" v1.0.0
+      hub release create -a release/*.img -m "Initial release" v1.0.0 g
